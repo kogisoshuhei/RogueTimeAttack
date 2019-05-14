@@ -12,7 +12,6 @@ namespace Completed
 		public int pointsPerFood = 10;				//食べ物の回復量
 		public int pointsPerSoda = 20;				//ソーダの回復量
 		public int wallDamage = 1;					//壁へのダメージ量
-		public Text foodText;						//食料を表示するテキスト
 
 		//効果音
 		public AudioClip moveSound1;				//1 of 2 Audio clips to play when player moves.
@@ -39,9 +38,6 @@ namespace Completed
 			
 			//foodをステージ間で引き継げるように、GameManagerから設定
 			food = GameManager.instance.playerFoodPoints;
-			
-			//foodTextを初期化.
-			foodText.text = "Food: " + food;
 			
 			//GameObjectのStartを呼び出す
 			base.Start ();
@@ -137,9 +133,6 @@ namespace Completed
 			//移動するたびに食料が減る
 			food--;
 			
-			//減らした食料をUIに表示する
-			foodText.text = "Food: " + food;
-			
 			//MovingObjectのAttemptMoveを呼び出す
 			base.AttemptMove <T> (xDir, yDir);
 
@@ -194,9 +187,6 @@ namespace Completed
 				//食料を回復
 				food += pointsPerFood;
 				
-				//増えた食料をUIに表示する
-				foodText.text = "+" + pointsPerFood + " Food: " + food;
-				
 				//食べた時の効果音を鳴らす
 				SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
 				
@@ -210,16 +200,15 @@ namespace Completed
 				//食料を回復
 				food += pointsPerSoda;
 				
-				//増えた食料をUIに表示する
-				foodText.text = "+" + pointsPerSoda + " Food: " + food;
-				
 				//飲んだ時の効果音を鳴らす
 				SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
 				
 				//ソーダを削除
 				other.gameObject.SetActive (false);
 			}
+
 		}
+
 		
 		
 		//プレイヤーがExitに到達した場合、次のステージを呼び出す
@@ -227,6 +216,7 @@ namespace Completed
 		{
 			//シーンを呼び直す
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+
 		}
 		
 		
@@ -239,11 +229,9 @@ namespace Completed
 			//食料を減らす
 			food -= loss;
 			
-			//減らした食料をUIに表示する
-			foodText.text = "-"+ loss + " Food: " + food;
-			
 			//ゲームオーバーか判定
 			CheckIfGameOver ();
+
 		}
 		
 		
@@ -261,8 +249,11 @@ namespace Completed
 				
 				//GameManagerのGameOverを呼び出す
 				GameManager.instance.GameOver ();
-			}
-		}
-	}
-}
 
+			}
+
+		}
+
+	}
+
+}

@@ -5,11 +5,10 @@ using System.Collections;
 namespace Completed
 {
 	using System.Collections.Generic;		//Allows us to use Lists. 
-	using UnityEngine.UI;					//Allows us to use UI.
+//	using UnityEngine.UI;					//Allows us to use UI.
 	
 	public class GameManager : MonoBehaviour
 	{
-		public float levelStartDelay = 2f;						//レベルスタート時の時間間隔
 		public float turnDelay = 0.1f;							//1ターンの時間
 		public int playerFoodPoints = 100;						//プレイヤーの食料
 
@@ -18,16 +17,12 @@ namespace Completed
 
 		[HideInInspector] public bool playersTurn = true;		//プレイヤーのターンかの判定フラグ
 
-		private Text levelText;									//レベルを表示するテキスト
-		private GameObject levelImage;							//UIの表示領域　表示のオンオフを切り替える
 		private BoardManager boardScript;						//BoardManager型の変数を宣言
 		private int level = 1;									//敵が出現するレベル
 		private List<Enemy> enemies;							//複数の敵を管理
 		private bool enemiesMoving;								//敵の移動フラグ
-		private bool doingSetup = true;							//設定中かどうかのフラグ
-		
-		
-		
+
+
 		// AwakeはStartよりも前、最初に呼ばれる
 		void Awake()
 		{
@@ -54,42 +49,10 @@ namespace Completed
 			InitGame();
 		}
 
-		//シーンが飛び出されたタイミングで実行される
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static public void CallbackInitialization()
-        {
-            //register the callback to be called everytime the scene is loaded
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-
-		//シーンが呼び出されたタイミングで初期化する
-        static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
-        {
-            instance.level++;
-            instance.InitGame();
-        }
-
 		
 		//Initializes the game for each level.
 		void InitGame()
 		{
-			//設定中フラグをオンにする
-			doingSetup = true;
-			
-			//levelImageにUIを設定する
-			levelImage = GameObject.Find("LevelImage");
-			
-			//levelTextにUIのテキストを取得し設定する
-			levelText = GameObject.Find("LevelText").GetComponent<Text>();
-			
-			//levelTextにゲーム内のlevelを設定する
-			levelText.text = "Day " + level;
-			
-			//UIを表示する
-			levelImage.SetActive(true);
-			
-			//2秒後にUIを非表示にする
-			Invoke("HideLevelImage", levelStartDelay);
 			
 			//ステージ移動時は敵をリセットする
 			enemies.Clear();
@@ -98,23 +61,13 @@ namespace Completed
 			boardScript.SetupScene(level);
 			
 		}
-		
-		
-		//UIを非表示にする
-		void HideLevelImage()
-		{
-			//Disable the levelImage gameObject.
-			levelImage.SetActive(false);
-			
-			//Set doingSetup to false allowing player to move again.
-			doingSetup = false;
-		}
+
 		
 		//Update is called every frame.
 		void Update()
 		{
 			//プレイヤーのターンか、敵の動いている場合は、アップデートしない
-			if(playersTurn || enemiesMoving || doingSetup)
+			if(playersTurn || enemiesMoving )
 				
 				//If any of these are true, return and do not start MoveEnemies.
 				return;
@@ -134,14 +87,10 @@ namespace Completed
 		//GameOver is called when the player reaches 0 food points
 		public void GameOver()
 		{
-			//Set levelText to display number of levels passed and game over message
-			levelText.text = "After " + level + " days, you starved.";
 			
-			//Enable black background image gameObject.
-			levelImage.SetActive(true);
-			
-			//Disable this GameManager.
+			//enabledをfalseにすることで、GameManagerが無効になる
 			enabled = false;
+
 		}
 		
 		//敵を移動させる処理
@@ -173,7 +122,9 @@ namespace Completed
 			//プレイヤーのターンにする
 			playersTurn = true;
 			enemiesMoving = false;
-		}
-	}
-}
 
+		}
+
+	}
+
+}
