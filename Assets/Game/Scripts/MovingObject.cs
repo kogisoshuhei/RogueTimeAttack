@@ -36,7 +36,8 @@ namespace Completed
 			//移動先を取得
 			Vector2 end = start + new Vector2 (xDir, yDir);
 			
-			//自身のColliderを一旦無効化する　※startとendの間にblockingLayerがあるか確認するときに不要なため
+			//自身のColliderを一旦無効化する
+			//※startとendの間にblockingLayerがあるか確認するときに不要なため
 			boxCollider.enabled = false;
 			
 			//現在地と移動先の間にblockingLayerがあるか確認、ある場合取得
@@ -85,7 +86,7 @@ namespace Completed
 		
 		
 		//継承クラスでオーバーライドできるようにする
-		//移動を試し、書が異物がある場合、移動不可の場合の処理を呼び出す
+		//移動を試し、障害物がある場合、移動不可の場合の処理を呼び出す
 		protected virtual void AttemptMove <T> (int xDir, int yDir)
 
 			where T : Component			//後からコンポーネントを決める
@@ -105,7 +106,7 @@ namespace Completed
 			//現在地から目的地の間にblockingLayerに該当するものがある場合
 			//障害物のコンポーネントを取得
 			T hitComponent = hit.transform.GetComponent <T> ();
-			
+
 			//障害物がある場合、移動不可の場合の処理を呼び出す
 			if(!canMove && hitComponent != null)
 				
@@ -115,6 +116,10 @@ namespace Completed
 		
 		//抽象クラス 
 		protected abstract void OnCantMove <T> (T component)
+			where T : Component;
+
+		//20190515追加
+		protected abstract void EnemyHere <T> (T component)
 			where T : Component;
 	}
 }

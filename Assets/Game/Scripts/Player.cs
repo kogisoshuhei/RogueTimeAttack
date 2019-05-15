@@ -8,26 +8,28 @@ namespace Completed
 	//MovingObjectクラスを継承する
 	public class Player : MovingObject
 	{
+
+		public Text hpText; 						//HPを表示するテキスト
+
 		public float restartLevelDelay = 1f;		//ステージ移動時の時間
-		public int pointsPerFood = 10;				//食べ物の回復量
-		public int pointsPerSoda = 20;				//ソーダの回復量
+		public int pointsPerFood = 1;				//食べ物の回復量
+		public int pointsPerSoda = 2;				//ソーダの回復量
 		public int wallDamage = 1;					//壁へのダメージ量
+		public int enemyDamage = 1;					//敵へのダメージ量
 
 		//効果音
-		public AudioClip moveSound1;				//1 of 2 Audio clips to play when player moves.
-		public AudioClip moveSound2;				//2 of 2 Audio clips to play when player moves.
-		public AudioClip eatSound1;					//1 of 2 Audio clips to play when player collects a food object.
-		public AudioClip eatSound2;					//2 of 2 Audio clips to play when player collects a food object.
-		public AudioClip drinkSound1;				//1 of 2 Audio clips to play when player collects a soda object.
-		public AudioClip drinkSound2;				//2 of 2 Audio clips to play when player collects a soda object.
-		public AudioClip gameOverSound;				//Audio clip to play when player dies.
+		public AudioClip moveSound1;				
+		public AudioClip moveSound2;				
+		public AudioClip eatSound1;					
+		public AudioClip eatSound2;					
+		public AudioClip drinkSound1;				
+		public AudioClip drinkSound2;				
+		public AudioClip gameOverSound;				
 		
 		private Animator animator;					//アニメーション用変数
-		private int food;                           //食料
+		private int hp;                           	//プレイヤーのHP
 
-#if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
-#endif
 		
 		
 		//MovingObjectクラスのStartを継承する
@@ -36,8 +38,11 @@ namespace Completed
 			//animatorのコンポーネントを設定
 			animator = GetComponent<Animator>();
 			
-			//foodをステージ間で引き継げるように、GameManagerから設定
-			food = GameManager.instance.playerFoodPoints;
+			//hpをステージ間で引き継げるように、GameManagerから設定
+			hp = GameManager.instance.playerFoodPoints;
+
+			//hpTextを初期化
+			hpText.text = " HP: " + hp;
 			
 			//GameObjectのStartを呼び出す
 			base.Start ();
@@ -49,74 +54,61 @@ namespace Completed
 		{
 			//Playerオブジェクトが無効になっているときは、
 			//現在のローカルフードの合計をGameManagerに保存して、次のレベルで再ロードできるようにする
-			GameManager.instance.playerFoodPoints = food;
+			GameManager.instance.playerFoodPoints = hp;
 		}
 		
 		
 		private void Update ()
 		{
 			//プレイヤーのターンではない場合、何も実行しない
-			if(!GameManager.instance.playersTurn) return;
+			if (!GameManager.instance.playersTurn) {
+
+				return;
+			
+			}
 
 			int horizontal = 0;  	//左右の移動
 			int vertical = 0;		//上下の移動
-			
-			//Check if we are running either in the Unity editor or in a standalone build.
-#if UNITY_STANDALONE || UNITY_WEBPLAYER
-			
-			//左右の移動量を受け取る
-			horizontal = (int) (Input.GetAxisRaw ("Horizontal"));
-			
-			//上下の移動量を受け取る
-			vertical = (int) (Input.GetAxisRaw ("Vertical"));
-			
-			//上下左右のいずれかに移動を制限する
-			if(horizontal != 0)
-			{
-				vertical = 0;
-			}
-			//Check if we are running on iOS, Android, Windows Phone 8 or Unity iPhone
-#elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
-			
-			//Check if Input has registered more than zero touches
+
+			//タッチされた場合
 			if (Input.touchCount > 0)
 			{
-				//Store the first touch detected.
+				//最初にタッチされた情報を取得
 				Touch myTouch = Input.touches[0];
-				
-				//Check if the phase of that touch equals Began
+
+				//タッチ開始時
 				if (myTouch.phase == TouchPhase.Began)
 				{
-					//If so, set touchOrigin to the position of that touch
+					//タッチした場所を取得
 					touchOrigin = myTouch.position;
+
 				}
-				
-				//If the touch phase is not Began, and instead is equal to Ended and the x of touchOrigin is greater or equal to zero:
+
+				//指を離した時かつ指の場所が0以上の場合
 				else if (myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0)
 				{
-					//Set touchEnd to equal the position of this touch
+					//指を離した場所を取得
 					Vector2 touchEnd = myTouch.position;
-					
-					//Calculate the difference between the beginning and end of the touch on the x axis.
+
+					//横方向の移動量を取得
 					float x = touchEnd.x - touchOrigin.x;
-					
-					//Calculate the difference between the beginning and end of the touch on the y axis.
+
+					//縦方向の移動量を取得
 					float y = touchEnd.y - touchOrigin.y;
-					
-					//Set touchOrigin.x to -1 so that our else if statement will evaluate false and not repeat immediately.
+
+
 					touchOrigin.x = -1;
-					
-					//Check if the difference along the x axis is greater than the difference along the y axis.
+
+					//横と縦の移動量が大きい方に移動する
 					if (Mathf.Abs(x) > Mathf.Abs(y))
-						//If x is greater than zero, set horizontal to 1, otherwise set it to -1
+						
 						horizontal = x > 0 ? 1 : -1;
+					
 					else
-						//If y is greater than zero, set horizontal to 1, otherwise set it to -1
+						
 						vertical = y > 0 ? 1 : -1;
 				}
 			}
-			
-#endif //End of mobile platform dependendent compilation section started above with #elif
 
 			//左右上下のいずれかに移動する場合
 			if(horizontal != 0 || vertical != 0)
@@ -130,8 +122,7 @@ namespace Completed
 		//AttemptMoveは一般的なパラメータTを取ります。このパラメータはPlayerの場合はWall型になります。移動するx方向とy方向の整数も取ります。
 		protected override void AttemptMove <T> (int xDir, int yDir)
 		{
-			//移動するたびに食料が減る
-			food--;
+
 			
 			//MovingObjectのAttemptMoveを呼び出す
 			base.AttemptMove <T> (xDir, yDir);
@@ -154,7 +145,7 @@ namespace Completed
 		}
 		
 		
-		//プレイヤーが壁にぶつかった場合、壁をチョップする
+		//プレイヤーが壁にぶつかった場合、壁を攻撃する
 		protected override void OnCantMove <T> (T component)
 		{
 			//Wallスクリプトを使えるように設定
@@ -163,6 +154,20 @@ namespace Completed
 			//壁にダメージを与える
 			hitWall.DamageWall (wallDamage);
 			
+			//チョップするアニメーションを呼び出す
+			animator.SetTrigger ("playerChop");
+		}
+
+		//20190515追加
+		//プレイヤーが敵に遭遇した場合、敵を攻撃する
+		protected override void EnemyHere <T> (T component)
+		{
+			//Enemyスクリプトを使えるように設定
+			Enemy hitDamage = component as Enemy;
+
+			//敵にダメージを与える
+			hitDamage.Damage (enemyDamage);
+
 			//チョップするアニメーションを呼び出す
 			animator.SetTrigger ("playerChop");
 		}
@@ -180,30 +185,20 @@ namespace Completed
 				//レベルが終わったのでプレイヤーオブジェクトを無効にする
 				enabled = false;
 			}
-			
+
 			//食料と接触した場合
-			else if(other.tag == "Food")
+			else if(other.tag == "Food" || other.tag == "Soda")
 			{
-				//食料を回復
-				food += pointsPerFood;
+				//HPを回復
+				hp += pointsPerFood;
+
+				//増えた食料をUIに表示する
+				hpText.text = "+"+pointsPerFood+" HP: " + hp;
 				
-				//食べた時の効果音を鳴らす
+				//回復時の効果音を鳴らす
 				SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
 				
-				//食料を削除
-				other.gameObject.SetActive (false);
-			}
-			
-			//Check if the tag of the trigger collided with is Soda.
-			else if(other.tag == "Soda")
-			{
-				//食料を回復
-				food += pointsPerSoda;
-				
-				//飲んだ時の効果音を鳴らす
-				SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
-				
-				//ソーダを削除
+				//HPを削除
 				other.gameObject.SetActive (false);
 			}
 
@@ -227,7 +222,10 @@ namespace Completed
 			animator.SetTrigger ("playerHit");
 			
 			//食料を減らす
-			food -= loss;
+			hp -= loss;
+
+			//減らした食料をUIに表示する
+			hpText.text = "-" + loss+ " HP: " + hp;
 			
 			//ゲームオーバーか判定
 			CheckIfGameOver ();
@@ -239,7 +237,7 @@ namespace Completed
 		private void CheckIfGameOver ()
 		{
 			//食料の合計が0以下かどうかを確認
-			if (food <= 0) 
+			if (hp <= 0) 
 			{
 				//SoundManagerのPlaySingle関数を呼び出して、再生するオーディオクリップとしてgameOverSoundを渡します。
 				SoundManager.instance.PlaySingle (gameOverSound);

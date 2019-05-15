@@ -15,7 +15,10 @@ namespace Completed
 		
 		private Animator animator;
 		private Transform target;			//プレイヤー場所
-		private bool skipMove;				//動くか判定
+		private bool skipMove;				//動くかどうかの判定
+
+		//20190515追加
+		public int hp = 2;					//モンスターHP
 		
 		
 		//継承クラス
@@ -84,7 +87,7 @@ namespace Completed
 			//衝突したプレイヤーを設定
 			Player hitPlayer = component as Player;
 			
-			//プレイヤーの食料を減らす
+			//プレイヤーのHPを減らす
 			hitPlayer.LoseFood (playerDamage);
 			
 			//プレイヤーに攻撃するアニメーションを呼び出す
@@ -92,6 +95,22 @@ namespace Completed
 			
 			//攻撃する効果音を鳴らす
 			SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
+
+		}
+
+		//20190515追加
+		//敵が攻撃されたときに呼ばれる
+		public void Damage (int loss)
+		{
+
+			//HPを減らす
+			hp -= loss;
+
+			//hpが0以下になった場合
+			if(hp <= 0)
+
+				//敵を無効にする
+				gameObject.SetActive (false);
 
 		}
 

@@ -11,7 +11,7 @@ namespace Completed
 
 		//sprite = 画像
 		public Sprite dmgSprite;					//攻撃された時の壁の画像
-		public int hp = 3;							//壁のHP
+		public int hp = 3;							//壁HP
 		
 		
 		private SpriteRenderer spriteRenderer;		//画像を表示するコンポーネント
