@@ -16,7 +16,7 @@ namespace Completed
 		private bool doingSetup; 								//設定中かどうかのフラグ
 
 		public float turnDelay = 0.1f;							//1ターンの時間
-		public int playerFoodPoints = 3;						//プレイヤーの体力
+		public int playerHp = 3;								//プレイヤーの体力
 
 		public static GameManager instance = null;				//クラスに属し、複数のシーンで使われる変数を宣言
 																//Staticにすることで、他のスクリプトからも呼び出すことができます
@@ -24,7 +24,7 @@ namespace Completed
 		[HideInInspector] public bool playersTurn = true;		//プレイヤーのターンかの判定フラグ
 
 		private BoardManager boardScript;						//BoardManager型の変数を宣言
-		private int level = 1;									//敵が出現するレベル
+		private int level = 5;									//階層
 		private List<Enemy> enemies;							//複数の敵を管理
 		private bool enemiesMoving;								//敵の移動フラグ
 
@@ -55,7 +55,7 @@ namespace Completed
 			InitGame();
 		}
 
-		//シーンが飛び出されたタイミングで実行される
+		//シーンが呼び出されたタイミングで実行される
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		static public void CallbackInitialization()
 		{
@@ -66,7 +66,7 @@ namespace Completed
 		//シーンが呼び出されたタイミングで初期化する
 		static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
 		{
-			instance.level++;
+			instance.level--;
 			instance.InitGame();
 		}
 
@@ -85,7 +85,7 @@ namespace Completed
 			levelText = GameObject.Find("LevelText").GetComponent<Text>();
 
 			//levelTextにゲーム内のlevelを設定する
-			levelText.text = "Level " + level;
+			levelText.text = "脱出まで残り " + level + " F";
 
 			//UIを表示する
 			levelImage.SetActive(true);
@@ -160,16 +160,30 @@ namespace Completed
 
 		}
 
-		//GameOver is called when the player reaches 0 food points
+		//ゲームオーバー時の表示
 		public void GameOver()
 		{
 			//ゲームオーバー時のテキストを設定
-			levelText.text = "After " + level + " days, you starved.";
+			levelText.text = "プレイヤーは " + level + " で生き絶えた";
 			//UIを表示
 			levelImage.SetActive(true);
 
 			//enabledをfalseにすることで、GameManagerが無効になる
 			enabled = false;
+
+		}
+
+		//ゲームクリア時の表示
+		public void GameClear()
+		{
+			if ( level == 1 ) {
+				
+				//ゲームクリア時のテキストを設定
+				levelText.text = "プレイヤーは無事に生還した!";
+				//UIを表示
+				levelImage.SetActive (true);
+
+			}
 
 		}
 

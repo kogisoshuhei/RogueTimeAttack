@@ -98,6 +98,24 @@ namespace Completed
 
 		}
 
+		//敵がプレイヤーと隣り合っている時の処理
+		protected override void EnemyHere <T> (T component)
+		{
+
+			//衝突したプレイヤーを設定
+			Player hitPlayer = component as Player;
+
+			//プレイヤーのHPを減らす
+			hitPlayer.LoseFood (playerDamage);
+
+			//プレイヤーに攻撃するアニメーションを呼び出す
+			animator.SetTrigger ("enemyAttack");
+
+			//攻撃する効果音を鳴らす
+			SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
+
+		}
+
 		//20190515追加
 		//敵が攻撃されたときに呼ばれる
 		public void Damage (int loss)

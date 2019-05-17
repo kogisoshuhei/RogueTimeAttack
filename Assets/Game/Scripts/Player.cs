@@ -9,7 +9,11 @@ namespace Completed
 	public class Player : MovingObject
 	{
 
-		public Text hpText; 						//HPを表示するテキスト
+		//public Text hpText; 						//HPを表示するテキスト
+
+		public GameObject playerHp1; 				// プレイヤー残り体力1を示すUI
+		public GameObject playerHp2; 				// プレイヤー残り体力2を示すUI
+		public GameObject playerHp3; 				// プレイヤー残り体力3を示すUI
 
 		public float restartLevelDelay = 1f;		//ステージ移動時の時間
 		public int pointsPerFood = 1;				//食べ物の回復量
@@ -29,7 +33,8 @@ namespace Completed
 		private Animator animator;					//アニメーション用変数
 		private int hp;                           	//プレイヤーのHP
 
-        private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
+		//Used to store location of screen touch origin for mobile controls.
+        private Vector2 touchOrigin = -Vector2.one;	
 		
 		
 		//MovingObjectクラスのStartを継承する
@@ -39,10 +44,10 @@ namespace Completed
 			animator = GetComponent<Animator>();
 			
 			//hpをステージ間で引き継げるように、GameManagerから設定
-			hp = GameManager.instance.playerFoodPoints;
+			hp = GameManager.instance.playerHp;
 
 			//hpTextを初期化
-			hpText.text = " HP: " + hp;
+			//hpText.text = " HP: " + hp;
 			
 			//GameObjectのStartを呼び出す
 			base.Start ();
@@ -54,7 +59,8 @@ namespace Completed
 		{
 			//Playerオブジェクトが無効になっているときは、
 			//現在のローカルフードの合計をGameManagerに保存して、次のレベルで再ロードできるようにする
-			GameManager.instance.playerFoodPoints = hp;
+			GameManager.instance.playerHp = hp;
+
 		}
 		
 		
@@ -116,6 +122,7 @@ namespace Completed
 				//プレイヤーの侵攻方向に壁があるか確認
 				AttemptMove<Wall> (horizontal, vertical);
 			}
+
 		}
 		
 		//AttemptMoveは、基本クラスMovingObjectのAttemptMove関数をオーバーライドします。
@@ -148,6 +155,7 @@ namespace Completed
 		//プレイヤーが壁にぶつかった場合、壁を攻撃する
 		protected override void OnCantMove <T> (T component)
 		{
+
 			//Wallスクリプトを使えるように設定
 			Wall hitWall = component as Wall;
 			
@@ -162,6 +170,9 @@ namespace Completed
 		//プレイヤーが敵に遭遇した場合、敵を攻撃する
 		protected override void EnemyHere <T> (T component)
 		{
+
+			Debug.Log ("関数を実行");
+
 			//Enemyスクリプトを使えるように設定
 			Enemy hitDamage = component as Enemy;
 
@@ -170,6 +181,9 @@ namespace Completed
 
 			//チョップするアニメーションを呼び出す
 			animator.SetTrigger ("playerChop");
+
+			Debug.Log ("プレイヤーが攻撃した");
+
 		}
 		
 		
@@ -193,7 +207,7 @@ namespace Completed
 				hp += pointsPerFood;
 
 				//増えた食料をUIに表示する
-				hpText.text = "+"+pointsPerFood+" HP: " + hp;
+				//hpText.text = "+"+pointsPerFood+" HP: " + hp;
 				
 				//回復時の効果音を鳴らす
 				SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
@@ -205,35 +219,60 @@ namespace Completed
 		}
 
 		
-		
 		//プレイヤーがExitに到達した場合、次のステージを呼び出す
 		private void Restart ()
 		{
+
+			//ゲームクリアしたかどうかの判定
+			CheckIfGameClear ();
+
 			//シーンを呼び直す
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
 
 		}
 		
 		
-		//プレイヤーが敵に攻撃された場合、食料を減らす
+		//プレイヤーが敵に攻撃された場合、HPを減らす
 		public void LoseFood (int loss)
 		{
 			//攻撃を受けたアニメーションを呼び出す
 			animator.SetTrigger ("playerHit");
 			
-			//食料を減らす
+			//HPを減らす
 			hp -= loss;
 
+			//HPカウントを呼び出す
+			playerHealthCount ();
+
 			//減らした食料をUIに表示する
-			hpText.text = "-" + loss+ " HP: " + hp;
+			//hpText.text = "-" + loss+ " HP: " + hp;
 			
 			//ゲームオーバーか判定
 			CheckIfGameOver ();
 
 		}
+
+		public void playerHealthCount(){
+
+			// 残り体力によって非表示にすべき体力アイコンを消去する
+			if (hp == 2)
+			{ // 体力2になった場合
+				Destroy (playerHp3); // 3つめのアイコンを消去
+			}
+			else if (hp == 1)
+			{ // 体力1になった場合
+				Destroy (playerHp2); // 2つめのアイコンを消去
+			}
+			else if (hp == 0)
+			{ // 体力0になった場合
+				Destroy (playerHp1); // 1つめのアイコンを消去
+				CheckIfGameOver();
+			}
+
+		}
 		
 		
-		//食料が0いかになった場合、ゲームオーバーにする
+		//HPが0以下になった場合、ゲームオーバーにする
 		private void CheckIfGameOver ()
 		{
 			//食料の合計が0以下かどうかを確認
@@ -249,6 +288,14 @@ namespace Completed
 				GameManager.instance.GameOver ();
 
 			}
+
+		}
+
+		//HPが0以下になった場合、ゲームオーバーにする
+		private void CheckIfGameClear ()
+		{
+				//GameManagerのGameOverを呼び出す
+				GameManager.instance.GameClear ();
 
 		}
 
