@@ -81,7 +81,7 @@ namespace Completed
 		}
 		
 		
-		//敵が移動できない時の処理
+		//敵が攻撃する時に呼び出す
 		protected override void OnCantMove <T> (T component)
 		{
 			//衝突したプレイヤーを設定
@@ -93,24 +93,6 @@ namespace Completed
 			//プレイヤーに攻撃するアニメーションを呼び出す
 			animator.SetTrigger ("enemyAttack");
 			
-			//攻撃する効果音を鳴らす
-			SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
-
-		}
-
-		//敵がプレイヤーと隣り合っている時の処理
-		protected override void EnemyHere <T> (T component)
-		{
-
-			//衝突したプレイヤーを設定
-			Player hitPlayer = component as Player;
-
-			//プレイヤーのHPを減らす
-			hitPlayer.LoseFood (playerDamage);
-
-			//プレイヤーに攻撃するアニメーションを呼び出す
-			animator.SetTrigger ("enemyAttack");
-
 			//攻撃する効果音を鳴らす
 			SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
 

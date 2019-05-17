@@ -17,7 +17,7 @@ namespace Completed
 
 		public float restartLevelDelay = 1f;		//ステージ移動時の時間
 		public int pointsPerFood = 1;				//食べ物の回復量
-		public int pointsPerSoda = 2;				//ソーダの回復量
+		//public int pointsPerSoda = 2;				//ソーダの回復量
 		public int wallDamage = 1;					//壁へのダメージ量
 		public int enemyDamage = 1;					//敵へのダメージ量
 
@@ -40,6 +40,7 @@ namespace Completed
 		//MovingObjectクラスのStartを継承する
 		protected override void Start ()
 		{
+
 			//animatorのコンポーネントを設定
 			animator = GetComponent<Animator>();
 			
@@ -66,6 +67,7 @@ namespace Completed
 		
 		private void Update ()
 		{
+
 			//プレイヤーのターンではない場合、何も実行しない
 			if (!GameManager.instance.playersTurn) {
 
@@ -120,7 +122,7 @@ namespace Completed
 			if(horizontal != 0 || vertical != 0)
 			{
 				//プレイヤーの侵攻方向に壁があるか確認
-				AttemptMove<Wall> (horizontal, vertical);
+				AttemptMove<Enemy> (horizontal, vertical);
 			}
 
 		}
@@ -152,26 +154,11 @@ namespace Completed
 		}
 		
 		
-		//プレイヤーが壁にぶつかった場合、壁を攻撃する
+		//プレイヤーが敵にぶつかった場合、敵を攻撃する
 		protected override void OnCantMove <T> (T component)
 		{
 
-			//Wallスクリプトを使えるように設定
-			Wall hitWall = component as Wall;
-			
-			//壁にダメージを与える
-			hitWall.DamageWall (wallDamage);
-			
-			//チョップするアニメーションを呼び出す
-			animator.SetTrigger ("playerChop");
-		}
-
-		//20190515追加
-		//プレイヤーが敵に遭遇した場合、敵を攻撃する
-		protected override void EnemyHere <T> (T component)
-		{
-
-			Debug.Log ("関数を実行");
+			Debug.Log ("敵に接触した");
 
 			//Enemyスクリプトを使えるように設定
 			Enemy hitDamage = component as Enemy;
@@ -182,7 +169,7 @@ namespace Completed
 			//チョップするアニメーションを呼び出す
 			animator.SetTrigger ("playerChop");
 
-			Debug.Log ("プレイヤーが攻撃した");
+			Debug.Log ("プレイヤーが攻撃した" + enemyDamage "のダメージを与えた");
 
 		}
 		
@@ -193,7 +180,7 @@ namespace Completed
 			//Exitと接触した場合
 			if(other.tag == "Exit")
 			{
-				//ステージ移動の時間分待ってから、次のツテージに移動する
+				//ステージ移動の時間分待ってから、次のステージに移動する
 				Invoke ("Restart", restartLevelDelay);
 				
 				//レベルが終わったのでプレイヤーオブジェクトを無効にする
@@ -203,17 +190,46 @@ namespace Completed
 			//食料と接触した場合
 			else if(other.tag == "Food" || other.tag == "Soda")
 			{
-				//HPを回復
-				hp += pointsPerFood;
+				if (hp < 3) {
 
-				//増えた食料をUIに表示する
-				//hpText.text = "+"+pointsPerFood+" HP: " + hp;
+					// 残り体力によって非表示にすべき体力アイコンを消去する
+					if (hp == 2)
+					{ // 体力2になった場合
+						//Destroy (playerHp3); // 3つめのアイコンを消去
+
+						//HPを回復
+						hp += pointsPerFood;
+
+						playerHp3.SetActive(true);
+
+					}
+					else if (hp == 1)
+					{ // 体力1になった場合
+						//Destroy (playerHp2); // 2つめのアイコンを消去
+
+						//HPを回復
+						hp += pointsPerFood;
+
+						playerHp2.SetActive(true);
+
+					}
+
+					Debug.Log ("1回復");
+
+					//増えた食料をUIに表示する
+					//hpText.text = "+"+pointsPerFood+" HP: " + hp;
+			
+					//回復時の効果音を鳴らす
+					SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
+			
+					//HPを削除
+					other.gameObject.SetActive (false);
+				} else {
+					
+					Debug.Log ("回復しない");
 				
-				//回復時の効果音を鳴らす
-				SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
-				
-				//HPを削除
-				other.gameObject.SetActive (false);
+				}
+
 			}
 
 		}
@@ -223,11 +239,8 @@ namespace Completed
 		private void Restart ()
 		{
 
-			//ゲームクリアしたかどうかの判定
-			CheckIfGameClear ();
-
-			//シーンを呼び直す
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+				//シーンを呼び直す
+				SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
 
 		}
 		
@@ -235,6 +248,7 @@ namespace Completed
 		//プレイヤーが敵に攻撃された場合、HPを減らす
 		public void LoseFood (int loss)
 		{
+
 			//攻撃を受けたアニメーションを呼び出す
 			animator.SetTrigger ("playerHit");
 			
@@ -257,15 +271,18 @@ namespace Completed
 			// 残り体力によって非表示にすべき体力アイコンを消去する
 			if (hp == 2)
 			{ // 体力2になった場合
-				Destroy (playerHp3); // 3つめのアイコンを消去
+				//Destroy (playerHp3); // 3つめのアイコンを消去
+				playerHp3.SetActive(false);
 			}
 			else if (hp == 1)
 			{ // 体力1になった場合
-				Destroy (playerHp2); // 2つめのアイコンを消去
+				//Destroy (playerHp2); // 2つめのアイコンを消去
+				playerHp2.SetActive(false);
 			}
 			else if (hp == 0)
 			{ // 体力0になった場合
-				Destroy (playerHp1); // 1つめのアイコンを消去
+				//Destroy (playerHp1); // 1つめのアイコンを消去
+				playerHp1.SetActive(false);
 				CheckIfGameOver();
 			}
 
@@ -291,7 +308,7 @@ namespace Completed
 
 		}
 
-		//HPが0以下になった場合、ゲームオーバーにする
+		//呼び出す
 		private void CheckIfGameClear ()
 		{
 				//GameManagerのGameOverを呼び出す

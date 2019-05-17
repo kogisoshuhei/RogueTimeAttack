@@ -119,8 +119,5 @@ namespace Completed
 		protected abstract void OnCantMove <T> (T component) 
 			where T : Component;
 
-		//20190515追加
-		protected abstract void EnemyHere <T> (T component)
-			where T : Component;
 	}
 }
