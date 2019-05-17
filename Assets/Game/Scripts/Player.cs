@@ -169,7 +169,7 @@ namespace Completed
 			//チョップするアニメーションを呼び出す
 			animator.SetTrigger ("playerChop");
 
-			Debug.Log ("プレイヤーが攻撃した" + enemyDamage "のダメージを与えた");
+			Debug.Log ("プレイヤーが攻撃した" + enemyDamage + "のダメージを与えた");
 
 		}
 		
