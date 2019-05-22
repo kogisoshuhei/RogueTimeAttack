@@ -145,7 +145,8 @@ namespace Completed
 			//敵やアイテム、内側の壁(Wall)を配置する
 			LayoutObjectAtRandom (wallTiles, wallCount.minimum, wallCount.maximum);
 			LayoutObjectAtRandom (foodTiles, foodCount.minimum, foodCount.maximum);
-			
+
+
 			//敵の数をLogで計算
 			int enemyCount = (int)Mathf.Log(level, 2f);
 

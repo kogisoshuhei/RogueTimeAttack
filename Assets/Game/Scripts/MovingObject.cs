@@ -6,14 +6,16 @@ namespace Completed
 	//抽象クラスとして作成していく
 	public abstract class MovingObject : MonoBehaviour
 	{
+
 		public float moveTime = 0.1f;			//動く時間
 		public LayerMask blockingLayer;
-		
-		
+
 		private BoxCollider2D boxCollider; 		//コンポーネント
 		private Rigidbody2D rb2D;				//コンポーネント
 		private float inverseMoveTime;
-		
+
+		//Enemyのスクリプトを取得
+		Enemy enemyScript;
 		
 		//継承クラスでオーバーライドできるようにする
 		protected virtual void Start ()
@@ -22,8 +24,11 @@ namespace Completed
 			boxCollider = GetComponent <BoxCollider2D> ();
 			rb2D = GetComponent <Rigidbody2D> ();
 			inverseMoveTime = 1f / moveTime;
+
+			//Enemyのスクリプトを代入
+			enemyScript = gameObject.GetComponent<Enemy>();
+
 		}
-		
 		
 		//移動可能か判断する　※blockingLayerに衝突する場合、移動しない
 		//boolはtrueかfalseを返す
@@ -54,12 +59,25 @@ namespace Completed
 				
 				//移動可能
 				return true;
+
 			}
-			
+
+			if (enemyScript != null) {
+
+				if (enemyScript.hp <= 0) {
+				
+					StopCoroutine (SmoothMovement (end));
+
+					//敵のオブジェクトを非アクティブにする
+					gameObject.SetActive (false);
+
+				}
+			}
+				
 			//移動不可
 			return false;
 		}
-		
+			
 		
 		//現在地から目的地までの距離を求めて移動する
 		protected IEnumerator SmoothMovement (Vector3 end)
@@ -116,8 +134,9 @@ namespace Completed
 		
 		
 		//抽象クラス 
+		//アタッチしたコンポーネントを指定
 		protected abstract void OnCantMove <T> (T component) 
-			where T : Component;
+			where T : Component;		//後からコンポーネントを決める
 
 	}
 }

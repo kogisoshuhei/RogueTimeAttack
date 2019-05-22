@@ -19,8 +19,8 @@ namespace Completed
 
 		//20190515追加
 		public int hp = 2;					//モンスターHP
-		
-		
+
+
 		//継承クラス
 		protected override void Start ()
 		{
@@ -37,7 +37,6 @@ namespace Completed
 			base.Start ();
 
 		}
-		
 		
 		//敵のターンか判定、移動を試みる処理
 		protected override void AttemptMove <T> (int xDir, int yDir)
@@ -86,15 +85,19 @@ namespace Completed
 		{
 			//衝突したプレイヤーを設定
 			Player hitPlayer = component as Player;
-			
-			//プレイヤーのHPを減らす
-			hitPlayer.LoseFood (playerDamage);
-			
-			//プレイヤーに攻撃するアニメーションを呼び出す
-			animator.SetTrigger ("enemyAttack");
-			
-			//攻撃する効果音を鳴らす
-			SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
+
+			if( hp > 0){
+
+				//プレイヤーのHPを減らす
+				hitPlayer.LoseFood (playerDamage);
+
+				//プレイヤーに攻撃するアニメーションを呼び出す
+				animator.SetTrigger ("enemyAttack");
+
+				//攻撃する効果音を鳴らす
+				SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
+
+			}
 
 		}
 
@@ -107,10 +110,11 @@ namespace Completed
 			hp -= loss;
 
 			//hpが0以下になった場合
-			if(hp <= 0)
+			if(hp <= 0){
 
-				//敵を無効にする
-				gameObject.SetActive (false);
+				Debug.Log ("敵が死んだ。");
+
+			}
 
 		}
 

@@ -24,7 +24,8 @@ namespace Completed
 		[HideInInspector] public bool playersTurn = true;		//プレイヤーのターンかの判定フラグ
 
 		private BoardManager boardScript;						//BoardManager型の変数を宣言
-		private int level = 5;									//階層
+		private int level = 1;									//難易度
+		private int floor = 5;									//階層
 		private List<Enemy> enemies;							//複数の敵を管理
 		private bool enemiesMoving;								//敵の移動フラグ
 
@@ -66,7 +67,8 @@ namespace Completed
 		//シーンが呼び出されたタイミングで初期化する
 		static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
 		{
-			instance.level--;
+			instance.level++;
+			instance.floor--;
 			instance.InitGame();
 		}
 
@@ -85,7 +87,7 @@ namespace Completed
 			levelText = GameObject.Find("LevelText").GetComponent<Text>();
 
 			//levelTextにゲーム内のlevelを設定する
-			levelText.text = "脱出まで残り " + level + " F";
+			levelText.text = "脱出まで残り " + floor + " F";
 
 			//UIを表示する
 			levelImage.SetActive(true);
@@ -164,24 +166,40 @@ namespace Completed
 		public void GameOver()
 		{
 			//ゲームオーバー時のテキストを設定
-			levelText.text = "プレイヤーは " + level + " で生き絶えた";
+			levelText.text = "プレイヤーは " + floor + "F で倒された・・・";
 			//UIを表示
 			levelImage.SetActive(true);
 
 			//enabledをfalseにすることで、GameManagerが無効になる
 			enabled = false;
 
+			if (Input.GetMouseButtonDown (0)) {
+				
+				SceneManager.LoadScene("Title");
+
+			}
+
+
 		}
 
 		//ゲームクリア時の表示
 		public void GameClear()
 		{
-			if ( level == 1 ) {
+			if ( level == 5 ) {
 				
 				//ゲームクリア時のテキストを設定
 				levelText.text = "プレイヤーは無事に生還した!";
 				//UIを表示
 				levelImage.SetActive (true);
+
+				//enabledをfalseにすることで、GameManagerが無効になる
+				enabled = false;
+
+				if (Input.GetMouseButtonDown (0)) {
+					
+					SceneManager.LoadScene("Result");
+
+				}
 
 			}
 

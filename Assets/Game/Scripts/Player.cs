@@ -33,7 +33,7 @@ namespace Completed
 		private Animator animator;					//アニメーション用変数
 		private int hp;                           	//プレイヤーのHP
 
-		//Used to store location of screen touch origin for mobile controls.
+		//タッチ位置の初期位置 Vector2(-1.0, -1.0)
         private Vector2 touchOrigin = -Vector2.one;	
 		
 		
@@ -46,6 +46,20 @@ namespace Completed
 			
 			//hpをステージ間で引き継げるように、GameManagerから設定
 			hp = GameManager.instance.playerHp;
+
+			//各階層での体力アイコンを引き継ぎ
+			//残り体力を表示
+			if (hp == 2) // 体力2の場合
+			{ 
+				playerHp3.SetActive(false);
+
+			}
+			else if (hp == 1) // 体力1の場合
+			{
+				playerHp3.SetActive(false);
+				playerHp2.SetActive(false);
+
+			}
 
 			//hpTextを初期化
 			//hpText.text = " HP: " + hp;
@@ -78,7 +92,22 @@ namespace Completed
 			int horizontal = 0;  	//左右の移動
 			int vertical = 0;		//上下の移動
 
+			/////
+
+			horizontal = (int)(Input.GetAxisRaw("Horizontal"));
+			vertical = (int)(Input.GetAxisRaw("Vertical"));
+
+			if (horizontal != 0) {
+				
+				vertical = 0;
+
+			}
+
+			/////
+
 			//タッチされた場合
+			/*
+			//タッチ数が1以上、つまり画面がタッチされたら
 			if (Input.touchCount > 0)
 			{
 				//最初にタッチされた情報を取得
@@ -116,16 +145,18 @@ namespace Completed
 						
 						vertical = y > 0 ? 1 : -1;
 				}
-			}
+			}*/
 
 			//左右上下のいずれかに移動する場合
 			if(horizontal != 0 || vertical != 0)
 			{
-				//プレイヤーの侵攻方向に壁があるか確認
+				//プレイヤーの侵攻方向に敵がいるか確認
 				AttemptMove<Enemy> (horizontal, vertical);
 			}
 
 		}
+
+
 		
 		//AttemptMoveは、基本クラスMovingObjectのAttemptMove関数をオーバーライドします。
 		//AttemptMoveは一般的なパラメータTを取ります。このパラメータはPlayerの場合はWall型になります。移動するx方向とy方向の整数も取ります。
@@ -169,7 +200,7 @@ namespace Completed
 			//チョップするアニメーションを呼び出す
 			animator.SetTrigger ("playerChop");
 
-			Debug.Log ("プレイヤーが攻撃した" + enemyDamage + "のダメージを与えた");
+			Debug.Log ("プレイヤーが攻撃した。 " + enemyDamage + " のダメージを与えた");
 
 		}
 		
