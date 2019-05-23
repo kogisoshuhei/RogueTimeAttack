@@ -18,7 +18,7 @@ namespace Completed
 		public float restartLevelDelay = 1f;		//ステージ移動時の時間
 		public int pointsPerFood = 1;				//食べ物の回復量
 		//public int pointsPerSoda = 2;				//ソーダの回復量
-		public int wallDamage = 1;					//壁へのダメージ量
+		//public int wallDamage = 1;				//壁へのダメージ量
 		public int enemyDamage = 1;					//敵へのダメージ量
 
 		//効果音
@@ -34,7 +34,7 @@ namespace Completed
 		private int hp;                           	//プレイヤーのHP
 
 		//タッチ位置の初期位置 Vector2(-1.0, -1.0)
-        private Vector2 touchOrigin = -Vector2.one;	
+//        private Vector2 touchOrigin = -Vector2.one;	
 		
 		
 		//MovingObjectクラスのStartを継承する
@@ -94,6 +94,9 @@ namespace Completed
 
 			/////
 
+			// //矢印操作
+
+
 			horizontal = (int)(Input.GetAxisRaw("Horizontal"));
 			vertical = (int)(Input.GetAxisRaw("Vertical"));
 
@@ -145,8 +148,8 @@ namespace Completed
 						
 						vertical = y > 0 ? 1 : -1;
 				}
-			}*/
-
+			}
+			*/
 			//左右上下のいずれかに移動する場合
 			if(horizontal != 0 || vertical != 0)
 			{
@@ -156,6 +159,149 @@ namespace Completed
 
 		}
 
+		/////
+		/// publicで矢印の方向を指定、ボタン側で設定する
+		/*
+		public void OnPressedRight()
+		{
+
+			Debug.Log ("右を押した");
+
+			//現在地を取得
+			Vector2 start = transform.position;
+
+			//方向を取得
+			Vector2 end = start + new Vector2(1, 0);
+
+			Debug.Log ("移動先取得");
+
+			boxCollider.enabled = false;
+
+			Debug.Log ("boxColliderを非アクティブ化");
+
+			//現在地と移動先の間にblockingLayerがあるか確認、ある場合取得
+			RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
+
+			Debug.Log ("blockingLayerを確認");
+
+			if (hit) {
+				Enemy hitComponent = hit.transform.GetComponent<Enemy> ();
+
+				if (hitComponent != null) {
+					OnCantMove (hitComponent);
+
+					Debug.Log ("攻撃した");
+				}
+			} else 
+			{
+				
+				base.StartCoroutine (SmoothMovement (end));
+
+			}
+				
+		}
+
+		public void OnPressedLeft()
+		{
+
+			Debug.Log ("左を押した");
+
+			//現在地を取得
+			Vector2 start = transform.position;
+
+			//移動先を取得
+			Vector2 end = start + new Vector2(-1, 0);
+
+			boxCollider.enabled = false;
+
+			//現在地と移動先の間にblockingLayerがあるか確認、ある場合取得
+			RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
+
+			if (hit)
+			{
+				Enemy hitComponent = hit.transform.GetComponent<Enemy>();
+
+				if (hitComponent != null)
+				{
+					OnCantMove (hitComponent);
+				}
+			} else 
+			{
+				
+				base.StartCoroutine (SmoothMovement (end));
+
+			}
+		}
+
+		public void OnPressedUp()
+		{
+
+			Debug.Log ("上を押した");
+
+			//現在地を取得
+			Vector2 start = transform.position;
+
+			//移動先を取得
+			Vector2 end = start + new Vector2(0, 1);
+
+			boxCollider.enabled = false;
+
+			//現在地と移動先の間にblockingLayerがあるか確認、ある場合取得
+			RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
+
+			if (hit)
+			{
+				Enemy hitComponent = hit.transform.GetComponent<Enemy>();
+
+				if (hitComponent != null)
+				{
+					OnCantMove (hitComponent);
+				}
+
+			} else 
+			{
+				
+				base.StartCoroutine (SmoothMovement (end));
+
+			}
+
+
+		}
+
+		public void OnPressedDown()
+		{
+			
+			Debug.Log ("下を押した");
+
+			//現在地を取得
+			Vector2 start = transform.position;
+
+			//移動先を取得
+			Vector2 end = start + new Vector2(0, -1);
+
+			boxCollider.enabled = false;
+
+			//現在地と移動先の間にblockingLayerがあるか確認、ある場合取得
+			RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
+
+			if (hit)
+			{
+				Enemy hitComponent = hit.transform.GetComponent<Enemy>();
+
+				if (hitComponent != null)
+				{
+					OnCantMove (hitComponent);
+				}
+
+			} else 
+			{
+				
+				base.StartCoroutine (SmoothMovement (end));
+
+			}
+
+		}
+		*/
 
 		
 		//AttemptMoveは、基本クラスMovingObjectのAttemptMove関数をオーバーライドします。
@@ -211,6 +357,9 @@ namespace Completed
 			//Exitと接触した場合
 			if(other.tag == "Exit")
 			{
+
+				Debug.Log ("出口に到着した");
+
 				//ステージ移動の時間分待ってから、次のステージに移動する
 				Invoke ("Restart", restartLevelDelay);
 				
@@ -279,12 +428,16 @@ namespace Completed
 		//プレイヤーが敵に攻撃された場合、HPを減らす
 		public void LoseFood (int loss)
 		{
+			
+			Debug.Log ("敵からの攻撃!");
 
 			//攻撃を受けたアニメーションを呼び出す
 			animator.SetTrigger ("playerHit");
 			
 			//HPを減らす
 			hp -= loss;
+
+			Debug.Log ("敵から " + loss + " のダメージを受けた");
 
 			//HPカウントを呼び出す
 			playerHealthCount ();
@@ -297,6 +450,7 @@ namespace Completed
 
 		}
 
+		//プレイヤーの体力アイコンの表示を管理
 		public void playerHealthCount(){
 
 			// 残り体力によって非表示にすべき体力アイコンを消去する
@@ -307,14 +461,18 @@ namespace Completed
 			}
 			else if (hp == 1)
 			{ // 体力1になった場合
+				
 				//Destroy (playerHp2); // 2つめのアイコンを消去
 				playerHp2.SetActive(false);
+
 			}
 			else if (hp == 0)
 			{ // 体力0になった場合
+				
 				//Destroy (playerHp1); // 1つめのアイコンを消去
 				playerHp1.SetActive(false);
 				CheckIfGameOver();
+
 			}
 
 		}
@@ -342,8 +500,8 @@ namespace Completed
 		//呼び出す
 		private void CheckIfGameClear ()
 		{
-				//GameManagerのGameOverを呼び出す
-				GameManager.instance.GameClear ();
+			//GameManagerのGameOverを呼び出す
+			GameManager.instance.GameClear ();
 
 		}
 

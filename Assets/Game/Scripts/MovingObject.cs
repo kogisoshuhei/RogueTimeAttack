@@ -10,12 +10,9 @@ namespace Completed
 		public float moveTime = 0.1f;			//動く時間
 		public LayerMask blockingLayer;
 
-		private BoxCollider2D boxCollider; 		//コンポーネント
+		public BoxCollider2D boxCollider; 		//コンポーネント
 		private Rigidbody2D rb2D;				//コンポーネント
 		private float inverseMoveTime;
-
-		//Enemyのスクリプトを取得
-		Enemy enemyScript;
 		
 		//継承クラスでオーバーライドできるようにする
 		protected virtual void Start ()
@@ -24,9 +21,6 @@ namespace Completed
 			boxCollider = GetComponent <BoxCollider2D> ();
 			rb2D = GetComponent <Rigidbody2D> ();
 			inverseMoveTime = 1f / moveTime;
-
-			//Enemyのスクリプトを代入
-			enemyScript = gameObject.GetComponent<Enemy>();
 
 		}
 		
@@ -62,18 +56,15 @@ namespace Completed
 
 			}
 
-			if (enemyScript != null) {
+//			if(  != false )
+//			{
+//
+//				StopCoroutine (SmoothMovement (end));
+//
+//				Enemy.Dead();
+//
+//			}
 
-				if (enemyScript.hp <= 0) {
-				
-					StopCoroutine (SmoothMovement (end));
-
-					//敵のオブジェクトを非アクティブにする
-					gameObject.SetActive (false);
-
-				}
-			}
-				
 			//移動不可
 			return false;
 		}

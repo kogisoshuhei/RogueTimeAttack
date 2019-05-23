@@ -105,14 +105,17 @@ namespace Completed
 		//敵が攻撃されたときに呼ばれる
 		public void Damage (int loss)
 		{
-
 			//HPを減らす
 			hp -= loss;
+
+			Debug.Log ("敵のHPは " + hp);
 
 			//hpが0以下になった場合
 			if(hp <= 0){
 
-				Debug.Log ("敵が死んだ。");
+				gameObject.SetActive (false);
+
+				Debug.Log ("敵消える");
 
 			}
 

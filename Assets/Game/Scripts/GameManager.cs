@@ -25,9 +25,12 @@ namespace Completed
 
 		private BoardManager boardScript;						//BoardManager型の変数を宣言
 		private int level = 1;									//難易度
-		private int floor = 5;									//階層
+		public int floor = 5;									//階層
 		private List<Enemy> enemies;							//複数の敵を管理
 		private bool enemiesMoving;								//敵の移動フラグ
+
+		public float time = 60;
+
 
 
 		// AwakeはStartよりも前、最初に呼ばれる
@@ -54,12 +57,14 @@ namespace Completed
 			
 			//ステージ生成の関数を呼ぶための、関数を呼ぶ
 			InitGame();
+
 		}
 
 		//シーンが呼び出されたタイミングで実行される
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		static public void CallbackInitialization()
 		{
+
 			//シーンがロードされるたびに呼び出されるコールバックを登録します
 			SceneManager.sceneLoaded += OnSceneLoaded;
 		}
@@ -67,9 +72,11 @@ namespace Completed
 		//シーンが呼び出されたタイミングで初期化する
 		static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
 		{
+
 			instance.level++;
 			instance.floor--;
 			instance.InitGame();
+
 		}
 
 		
@@ -121,6 +128,7 @@ namespace Completed
 			
 			//敵の動いていない、敵のターンのみ敵を動かす
 			StartCoroutine (MoveEnemies ());
+
 		}
 		
 		//敵をリストに加える処理
@@ -167,41 +175,32 @@ namespace Completed
 		{
 			//ゲームオーバー時のテキストを設定
 			levelText.text = "プレイヤーは " + floor + "F で倒された・・・";
+
 			//UIを表示
 			levelImage.SetActive(true);
 
 			//enabledをfalseにすることで、GameManagerが無効になる
 			enabled = false;
-
-			if (Input.GetMouseButtonDown (0)) {
 				
-				SceneManager.LoadScene("Title");
-
-			}
-
+			SceneManager.LoadScene("Title");
 
 		}
 
 		//ゲームクリア時の表示
 		public void GameClear()
 		{
-			if ( level == 5 ) {
-				
-				//ゲームクリア時のテキストを設定
-				levelText.text = "プレイヤーは無事に生還した!";
-				//UIを表示
-				levelImage.SetActive (true);
 
-				//enabledをfalseにすることで、GameManagerが無効になる
-				enabled = false;
+			//ゲームクリア時のテキストを設定
+			levelText.text = "プレイヤーは無事に生還した!";
 
-				if (Input.GetMouseButtonDown (0)) {
-					
-					SceneManager.LoadScene("Result");
+			//UIを表示
+			levelImage.SetActive (true);
 
-				}
+			//enabledをfalseにすることで、GameManagerが無効になる
+			enabled = false;
 
-			}
+			SceneManager.LoadScene("Result");
+
 
 		}
 
