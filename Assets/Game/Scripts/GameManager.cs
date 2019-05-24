@@ -11,7 +11,9 @@ namespace Completed
 	{
 
 		public float levelStartDelay = 2f; 						//レベルスタート時の時間間隔
+
 		private Text levelText; 								//レベルを表示するテキスト
+
 		private GameObject levelImage; 							//UIの表示領域　表示のオンオフを切り替える
 		private bool doingSetup; 								//設定中かどうかのフラグ
 
@@ -24,13 +26,14 @@ namespace Completed
 		[HideInInspector] public bool playersTurn = true;		//プレイヤーのターンかの判定フラグ
 
 		private BoardManager boardScript;						//BoardManager型の変数を宣言
-		private int level = 1;									//難易度
+		private int level = 3;									//難易度
 		public int floor = 5;									//階層
+//		public int score = 0;									//スコア
+
 		private List<Enemy> enemies;							//複数の敵を管理
 		private bool enemiesMoving;								//敵の移動フラグ
 
-		public float time = 60;
-
+		public float time = 60;									//制限時間
 
 
 		// AwakeはStartよりも前、最初に呼ばれる
@@ -189,18 +192,20 @@ namespace Completed
 		//ゲームクリア時の表示
 		public void GameClear()
 		{
+			Debug.Log ("ゲームクリア時に呼び出された");
 
-			//ゲームクリア時のテキストを設定
-			levelText.text = "プレイヤーは無事に生還した!";
+			if ( floor == 1 ) {
 
-			//UIを表示
-			levelImage.SetActive (true);
+				//ゲームクリア時のテキストを設定
+				levelText.text = "プレイヤーは無事に生還した!";
 
-			//enabledをfalseにすることで、GameManagerが無効になる
-			enabled = false;
+				//UIを表示
+				levelImage.SetActive (true);
 
-			SceneManager.LoadScene("Result");
-
+				//enabledをfalseにすることで、GameManagerが無効になる
+				enabled = false;
+			
+			}
 
 		}
 

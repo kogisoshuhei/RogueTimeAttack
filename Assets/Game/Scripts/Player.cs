@@ -33,6 +33,8 @@ namespace Completed
 		private Animator animator;					//アニメーション用変数
 		private int hp;                           	//プレイヤーのHP
 
+		private int floorEnd;
+
 		//タッチ位置の初期位置 Vector2(-1.0, -1.0)
 //        private Vector2 touchOrigin = -Vector2.one;	
 		
@@ -66,6 +68,7 @@ namespace Completed
 			
 			//GameObjectのStartを呼び出す
 			base.Start ();
+
 		}
 		
 		
@@ -81,6 +84,8 @@ namespace Completed
 		
 		private void Update ()
 		{
+
+
 
 			//プレイヤーのターンではない場合、何も実行しない
 			if (!GameManager.instance.playersTurn) {
@@ -159,9 +164,11 @@ namespace Completed
 
 		}
 
+
+
 		/////
 		/// publicで矢印の方向を指定、ボタン側で設定する
-		/*
+
 		public void OnPressedRight()
 		{
 
@@ -173,16 +180,10 @@ namespace Completed
 			//方向を取得
 			Vector2 end = start + new Vector2(1, 0);
 
-			Debug.Log ("移動先取得");
-
 			boxCollider.enabled = false;
-
-			Debug.Log ("boxColliderを非アクティブ化");
 
 			//現在地と移動先の間にblockingLayerがあるか確認、ある場合取得
 			RaycastHit2D hit = Physics2D.Linecast(start, end, blockingLayer);
-
-			Debug.Log ("blockingLayerを確認");
 
 			if (hit) {
 				Enemy hitComponent = hit.transform.GetComponent<Enemy> ();
@@ -192,13 +193,19 @@ namespace Completed
 
 					Debug.Log ("攻撃した");
 				}
+
 			} else 
 			{
 				
 				base.StartCoroutine (SmoothMovement (end));
 
+				boxCollider.enabled = true;
+
 			}
-				
+
+			//プレイヤーのターン終了
+			GameManager.instance.playersTurn = false;
+		
 		}
 
 		public void OnPressedLeft()
@@ -230,7 +237,13 @@ namespace Completed
 				
 				base.StartCoroutine (SmoothMovement (end));
 
+				boxCollider.enabled = true;
+
 			}
+
+			//プレイヤーのターン終了
+			GameManager.instance.playersTurn = false;
+
 		}
 
 		public void OnPressedUp()
@@ -263,8 +276,12 @@ namespace Completed
 				
 				base.StartCoroutine (SmoothMovement (end));
 
+				boxCollider.enabled = true;
+
 			}
 
+			//プレイヤーのターン終了
+			GameManager.instance.playersTurn = false;
 
 		}
 
@@ -298,10 +315,15 @@ namespace Completed
 				
 				base.StartCoroutine (SmoothMovement (end));
 
+				boxCollider.enabled = true;
+
 			}
 
+			//プレイヤーのターン終了
+			GameManager.instance.playersTurn = false;
+
 		}
-		*/
+
 
 		
 		//AttemptMoveは、基本クラスMovingObjectのAttemptMove関数をオーバーライドします。
@@ -346,7 +368,7 @@ namespace Completed
 			//チョップするアニメーションを呼び出す
 			animator.SetTrigger ("playerChop");
 
-			Debug.Log ("プレイヤーが攻撃した。 " + enemyDamage + " のダメージを与えた");
+			Debug.Log ("プレイヤーが攻撃した! " + enemyDamage + " のダメージを与えた");
 
 		}
 		
@@ -370,6 +392,9 @@ namespace Completed
 			//食料と接触した場合
 			else if(other.tag == "Food" || other.tag == "Soda")
 			{
+
+				Debug.Log ("アイテムと接触した");
+
 				if (hp < 3) {
 
 					// 残り体力によって非表示にすべき体力アイコンを消去する
@@ -418,9 +443,11 @@ namespace Completed
 		//プレイヤーがExitに到達した場合、次のステージを呼び出す
 		private void Restart ()
 		{
+			//ゲームオーバーか判定
+			CheckIfGameClear ();
 
-				//シーンを呼び直す
-				SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+			//シーンを呼び直す
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
 
 		}
 		
@@ -456,21 +483,23 @@ namespace Completed
 			// 残り体力によって非表示にすべき体力アイコンを消去する
 			if (hp == 2)
 			{ // 体力2になった場合
-				//Destroy (playerHp3); // 3つめのアイコンを消去
+				
+				// 3つめのアイコンを非アクティブにする
 				playerHp3.SetActive(false);
 			}
 			else if (hp == 1)
 			{ // 体力1になった場合
 				
-				//Destroy (playerHp2); // 2つめのアイコンを消去
+				// 2つめのアイコンを非アクティブにする
 				playerHp2.SetActive(false);
 
 			}
 			else if (hp == 0)
 			{ // 体力0になった場合
 				
-				//Destroy (playerHp1); // 1つめのアイコンを消去
+				// 1つめのアイコンを非アクティブにする
 				playerHp1.SetActive(false);
+
 				CheckIfGameOver();
 
 			}
@@ -482,13 +511,12 @@ namespace Completed
 		private void CheckIfGameOver ()
 		{
 			//食料の合計が0以下かどうかを確認
-			if (hp <= 0) 
-			{
+			if (hp <= 0) {
 				//SoundManagerのPlaySingle関数を呼び出して、再生するオーディオクリップとしてgameOverSoundを渡します。
 				SoundManager.instance.PlaySingle (gameOverSound);
 
 				//ゲームオーバーの時の効果音を鳴らす
-				SoundManager.instance.musicSource.Stop();
+				SoundManager.instance.musicSource.Stop ();
 				
 				//GameManagerのGameOverを呼び出す
 				GameManager.instance.GameOver ();
@@ -500,7 +528,8 @@ namespace Completed
 		//呼び出す
 		private void CheckIfGameClear ()
 		{
-			//GameManagerのGameOverを呼び出す
+				
+			//GameManagerのGameClearを呼び出す
 			GameManager.instance.GameClear ();
 
 		}

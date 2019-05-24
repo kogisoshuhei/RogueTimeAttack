@@ -19,7 +19,7 @@ namespace Completed
 
 			//初期値60を表示
 			//float型からint型へCastし、String型に変換して表示
-			GetComponent<Text>().text = ((int)allTime).ToString();
+			GetComponent<Text>().text = "残り " + ((int)allTime).ToString() + "秒";
 
 			//3秒遅れて開始
 			Invoke ("StartTimer", 3.0f);
@@ -57,7 +57,8 @@ namespace Completed
 			//マイナスは表示しない
 			if (allTime < 0) allTime = 0;
 
-			GetComponent<Text> ().text = ((int)allTime).ToString ();
+			GetComponent<Text> ().text = "残り " + ((int)allTime).ToString () + "秒";
+
 
 			if(allTime == 0)
 			{
@@ -68,4 +69,5 @@ namespace Completed
 		}
 
 	}
+
 }

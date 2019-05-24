@@ -20,10 +20,16 @@ namespace Completed
 		//20190515追加
 		public int hp = 2;					//モンスターHP
 
+		public int enemyAllPoint = 0;		//モンスターポイント
+		public int enemyPoint = 100;		//モンスターポイント
+
 
 		//継承クラス
 		protected override void Start ()
 		{
+
+			Debug.Log ("初期設定");
+
 			//敵をリストに加える
 			GameManager.instance.AddEnemyToList (this);
 			
@@ -41,19 +47,28 @@ namespace Completed
 		//敵のターンか判定、移動を試みる処理
 		protected override void AttemptMove <T> (int xDir, int yDir)
 		{
+
+			Debug.Log ("敵のターン開始");
+
 			//敵のターンではない場合
 			if(skipMove)
 			{
+
+				Debug.Log ("敵のターンじゃない");
+
 				skipMove = false;
 				return;
 				
 			}
 			
-			//MovingObjectからAttemptMove関数を呼び出します
+			//MovingObjectからAttemptMove関数を呼び出す
 			base.AttemptMove <T> (xDir, yDir);
 			
 			//敵のターンを終わる
 			skipMove = true;
+
+			Debug.Log ("敵のターン終了");
+
 		}
 		
 		
@@ -63,7 +78,9 @@ namespace Completed
 
 			int xDir = 0;			//左右の移動量
 			int yDir = 0;			//上下の移動量
-			
+
+			Debug.Log ("敵の移動開始");
+
 			//敵とプレイヤーの左右の距離がほぼ0の場合
 			if(Mathf.Abs (target.position.x - transform.position.x) < float.Epsilon)
 				
@@ -77,16 +94,23 @@ namespace Completed
 			//移動する
 			AttemptMove <Player> (xDir, yDir);
 
+			Debug.Log ("敵の移動終了");
+
 		}
 		
 		
 		//敵が攻撃する時に呼び出す
 		protected override void OnCantMove <T> (T component)
 		{
+
+			Debug.Log ("敵が攻撃をする");
+
 			//衝突したプレイヤーを設定
 			Player hitPlayer = component as Player;
 
 			if( hp > 0){
+
+				Debug.Log ("敵が生きてるので攻撃する");
 
 				//プレイヤーのHPを減らす
 				hitPlayer.LoseFood (playerDamage);
@@ -105,6 +129,9 @@ namespace Completed
 		//敵が攻撃されたときに呼ばれる
 		public void Damage (int loss)
 		{
+
+			Debug.Log ("敵が攻撃を受けた");
+
 			//HPを減らす
 			hp -= loss;
 
@@ -112,6 +139,9 @@ namespace Completed
 
 			//hpが0以下になった場合
 			if(hp <= 0){
+
+				enemyAllPoint += enemyPoint;
+				Debug.Log ( "合計で " + enemyAllPoint + " ptを獲得!");
 
 				gameObject.SetActive (false);
 

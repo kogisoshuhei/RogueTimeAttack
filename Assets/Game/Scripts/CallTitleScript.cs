@@ -2,12 +2,23 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class CallTitleScript : MonoBehaviour {
+namespace Completed
 
-	void Update ()
-	{
-		if (Input.GetMouseButtonDown (0)) {
-			SceneManager.LoadScene("Title");
+{
+	
+	public class CallTitleScript : MonoBehaviour {
+
+		void Start()
+		{
+			
+
+		}
+
+		void Update ()
+		{
+			if (Input.GetMouseButtonDown (0)) {
+				SceneManager.LoadScene("Title");
+			}
 		}
 	}
 }

@@ -2,17 +2,24 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class CallStageScript : MonoBehaviour {
+namespace Completed
 
-	void Start ()
-	{
+{
 
-	}
+	public class CallStageScript : MonoBehaviour {
 
-	void Update ()
-	{
-		if (Input.GetMouseButtonDown (0)) {
-			SceneManager.LoadScene("Game");
+
+		void Start ()
+		{
 		}
+
+		void Update ()
+		{
+			if (Input.GetMouseButtonDown (0)) {
+				SceneManager.LoadScene ("Game");
+			}
+		}
+
 	}
+
 }
