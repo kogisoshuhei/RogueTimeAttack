@@ -29,7 +29,7 @@ namespace Completed
 		public int columns = 8; 										//ステージの横幅
 		public int rows = 8;											//ステージの縦幅
 		public Count wallCount = new Count (5, 8);						//壁の個数の最小と最大を決める
-		public Count foodCount = new Count (1, 5);						//食料の個数の最小と最大を決める
+		public Count foodCount = new Count (1, 2);						//食料の個数の最小と最大を決める
 		public GameObject exit;											//終了するために生成するプレハブ。
 		public GameObject[] floorTiles;									//床プレハブの配列。
 		public GameObject[] wallTiles;									//壁プレハブの配列。

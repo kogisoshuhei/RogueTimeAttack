@@ -30,7 +30,7 @@ namespace Completed
 		}
 		
 		
-		//BGMを鳴らす処理.
+		//効果音を鳴らす処理.
 		public void PlaySingle(AudioClip clip)
 		{
 			

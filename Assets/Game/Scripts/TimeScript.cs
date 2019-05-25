@@ -27,7 +27,7 @@ namespace Completed
 
 		}
 
-		//PlayerのfoodをGameManageに保存する
+		//allTimeをGameManageに保存する
 		private void OnDisable ()
 		{
 			//Playerオブジェクトが無効になっているときは、
@@ -59,12 +59,11 @@ namespace Completed
 
 			GetComponent<Text> ().text = "残り " + ((int)allTime).ToString () + "秒";
 
-
-			if(allTime == 0)
+			if( allTime <= 0)
 			{
-				SceneManager.LoadScene("Result");
-
-			}	
+				SceneManager.LoadScene ("ResultDied");
+				
+			}
 
 		}
 

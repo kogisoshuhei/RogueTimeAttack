@@ -75,7 +75,6 @@ namespace Completed
 		//敵を移動させる処理
 		public void MoveEnemy ()
 		{
-
 			int xDir = 0;			//左右の移動量
 			int yDir = 0;			//上下の移動量
 
@@ -135,13 +134,13 @@ namespace Completed
 			//HPを減らす
 			hp -= loss;
 
+			//チョップするアニメーションを呼び出す
+			animator.SetTrigger ("enemyHit");
+
 			Debug.Log ("敵のHPは " + hp);
 
 			//hpが0以下になった場合
 			if(hp <= 0){
-
-				enemyAllPoint += enemyPoint;
-				Debug.Log ( "合計で " + enemyAllPoint + " ptを獲得!");
 
 				gameObject.SetActive (false);
 

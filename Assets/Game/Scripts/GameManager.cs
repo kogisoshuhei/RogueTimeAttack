@@ -33,11 +33,11 @@ namespace Completed
 		private List<Enemy> enemies;							//複数の敵を管理
 		private bool enemiesMoving;								//敵の移動フラグ
 
-		public float time = 60;									//制限時間
+		public float time = 30;									//制限時間
 
 
 		// AwakeはStartよりも前、最初に呼ばれる
-		void Awake()
+		private void Awake()
 		{
 			//GameManagerが存在しなければ、このオブジェクトを設定する
             if (instance == null)
@@ -46,8 +46,8 @@ namespace Completed
 
             else if (instance != this)
 
-				//すでに存在する場合、このオブジェクトは不要なため破壊する
-                Destroy(gameObject);
+			//すでに存在する場合、このオブジェクトは不要なため破壊する
+            Destroy(gameObject);
 			
 			//シーン遷移時に、このオブジェクトは破壊せず引き継ぐ
 			DontDestroyOnLoad(gameObject);
@@ -70,15 +70,35 @@ namespace Completed
 
 			//シーンがロードされるたびに呼び出されるコールバックを登録します
 			SceneManager.sceneLoaded += OnSceneLoaded;
+
+
 		}
 
 		//シーンが呼び出されたタイミングで初期化する
 		static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
 		{
 
-			instance.level++;
-			instance.floor--;
 			instance.InitGame();
+
+		}
+
+		public void NextLevel()
+		{
+			Debug.Log ("今の階層は " + floor + " F");
+
+			if( floor <= 1 )
+			{
+				Debug.Log ("クリア！");
+
+				GameClear ();
+
+			}else{
+
+				instance.level++;
+				instance.floor--;
+
+				Debug.Log ("次は " + floor + " F");
+			}
 
 		}
 
@@ -123,6 +143,7 @@ namespace Completed
 		//Update is called every frame.
 		void Update()
 		{
+
 			//プレイヤーのターンか、敵の動いている場合は、アップデートしない
 			if(playersTurn || enemiesMoving || doingSetup )
 				
@@ -169,43 +190,55 @@ namespace Completed
 
 			//プレイヤーのターンにする
 			playersTurn = true;
+
+			Debug.Log ("プレイヤーの移動を開始する");
+
 			enemiesMoving = false;
+
+			Debug.Log ("敵の移動を終了する");
 
 		}
 
 		//ゲームオーバー時の表示
 		public void GameOver()
 		{
-			//ゲームオーバー時のテキストを設定
-			levelText.text = "プレイヤーは " + floor + "F で倒された・・・";
+			Debug.Log ("ゲームオーバー時に呼び出された");
 
-			//UIを表示
-			levelImage.SetActive(true);
+			//ゲームオーバーの時のBGMをストップする
+			SoundManager.instance.musicSource.Stop ();
+
+			Debug.Log ("GameOver後、GameManagerを無効にする");
 
 			//enabledをfalseにすることで、GameManagerが無効になる
 			enabled = false;
-				
-			SceneManager.LoadScene("Title");
 
+			Debug.Log ("遷移前");
+
+			SceneManager.LoadScene("ResultDied");
+
+			Debug.Log ("遷移後");
+		
 		}
 
 		//ゲームクリア時の表示
 		public void GameClear()
 		{
+
 			Debug.Log ("ゲームクリア時に呼び出された");
 
-			if ( floor == 1 ) {
+			//ゲームオーバーの時のBGMをストップする
+			SoundManager.instance.musicSource.Stop ();
 
-				//ゲームクリア時のテキストを設定
-				levelText.text = "プレイヤーは無事に生還した!";
+			Debug.Log ("遷移前");
 
-				//UIを表示
-				levelImage.SetActive (true);
+			SceneManager.LoadScene ("ResultClear");
 
-				//enabledをfalseにすることで、GameManagerが無効になる
-				enabled = false;
-			
-			}
+			Debug.Log ("遷移後");
+
+			//enabledをfalseにすることで、GameManagerが無効になる
+			enabled = false;
+
+			Debug.Log ("GameClear後、GameManagerを無効にした");
 
 		}
 
